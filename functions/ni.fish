@@ -6,6 +6,8 @@ function ni --description "Use the right package manager"
             _ni_add_packages $argv[2..]
         case "remove"
             _ni_remove_packages $argv[2..]
+        case "run"
+            _ni_run_packages $argv[2..]
         case \*
             echo "ni: Unknown command or option: \"$argv[1]\"" >&2
             return 1
@@ -110,5 +112,22 @@ function _ni_remove_packages
             _ni_exec pnpm remove $argv
         case "bun"
             _ni_exec bun remove $argv
+    end
+end
+
+function _ni_run_packages
+    switch (_ni_get_package_manager_name $PWD)
+        case "npm"
+            if test (count $argv) -le 1
+                _ni_exec npm run $argv
+            else
+                _ni_exec npm run $argv[1] -- $argv[2..]
+            end
+        case "yarn"
+            _ni_exec yarn run $argv
+        case "pnpm"
+            _ni_exec pnpm run $argv
+        case "bun"
+            _ni_exec bun run $argv
     end
 end
