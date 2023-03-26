@@ -1,5 +1,7 @@
 function ni --description "Use the right package manager"
     switch $argv[1]
+        case "--help" "-h"
+            _ni_print_help
         case ""
             _ni_install_packages
         case "add"
@@ -74,6 +76,15 @@ function _ni_exec --argument-names command
 
     echo "ni: Exec command: $argv"
     eval $argv
+end
+
+function _ni_print_help
+    echo "Usage: ni                      Install all dependencies for a project"
+    echo "       ni add <package>        Add dependencies to the project and install"
+    echo "       ni remove <package>     Remove dependencies from the project and uninstall"
+    echo "       ni run <script>         Run a script defined in the package.json"
+    echo "Options:"
+    echo "       --help or -h            Print this help message"
 end
 
 function _ni_install_packages
