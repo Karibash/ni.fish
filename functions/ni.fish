@@ -2,6 +2,8 @@ function ni --description "Use the right package manager"
     switch $argv[1]
         case ""
             _ni_install_packages
+        case "add"
+            _ni_add_packages $argv[2..]
         case \*
             echo "ni: Unknown command or option: \"$argv[1]\"" >&2
             return 1
@@ -80,5 +82,18 @@ function _ni_install_packages
             _ni_exec pnpm install
         case "bun"
             _ni_exec bun install
+    end
+end
+
+function _ni_add_packages
+    switch (_ni_get_package_manager_name $PWD)
+        case "npm"
+            _ni_exec npm install $argv
+        case "yarn"
+            _ni_exec yarn add $argv
+        case "pnpm"
+            _ni_exec pnpm add $argv
+        case "bun"
+            _ni_exec bun add $argv
     end
 end
