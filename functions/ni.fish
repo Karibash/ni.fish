@@ -112,13 +112,13 @@ end
 function _ni_add_packages
     switch (_ni_get_package_manager_name $PWD)
         case "npm"
-            _ni_exec npm install (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev)
+            _ni_exec npm install (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
         case "yarn"
-            _ni_exec yarn add (_ni_replace_argv "$argv" -D --dev)
+            _ni_exec yarn add (_ni_replace_argv "$argv" -D --dev -O --optional)
         case "pnpm"
-            _ni_exec pnpm add (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev)
+            _ni_exec pnpm add (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
         case "bun"
-            _ni_exec bun add (_ni_replace_argv "$argv" --dev --development -D --development)
+            _ni_exec bun add (_ni_replace_argv "$argv" --dev --development -D --development -O --optional)
     end
 end
 
