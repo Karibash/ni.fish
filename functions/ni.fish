@@ -78,6 +78,15 @@ function _ni_exec --argument-names command
     eval $argv
 end
 
+function _ni_replace_argv --argument-names arguments target text
+    set replaced (string replace -- $target $text $arguments)
+    if test (count $argv[4..]) -eq 0
+        echo $replaced
+    else
+        _ni_replace_argv $replaced $argv[4..]
+    end
+end
+
 function _ni_print_help
     echo "Usage: ni                      Install all dependencies for a project"
     echo "       ni add <package>        Add dependencies to the project and install"
@@ -103,13 +112,13 @@ end
 function _ni_add_packages
     switch (_ni_get_package_manager_name $PWD)
         case "npm"
-            _ni_exec npm install $argv
+            _ni_exec npm install (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev)
         case "yarn"
-            _ni_exec yarn add $argv
+            _ni_exec yarn add (_ni_replace_argv "$argv" -D --dev)
         case "pnpm"
-            _ni_exec pnpm add $argv
+            _ni_exec pnpm add (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev)
         case "bun"
-            _ni_exec bun add $argv
+            _ni_exec bun add (_ni_replace_argv "$argv" --dev --development -D --development)
     end
 end
 
