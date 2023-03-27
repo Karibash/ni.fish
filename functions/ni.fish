@@ -78,6 +78,26 @@ function _ni_exec --argument-names command
     eval $argv
 end
 
+function _ni_contains_argv --argument-names arguments target
+    if string match -q -r -- $target $arguments
+        return 0
+    end
+
+    if test (count $argv[3..]) -eq 0
+        return 1
+    else
+        _ni_contains_argv $arguments $argv[3..]
+    end
+end
+
+function _ni_remove_argv --argument-names arguments target
+    if test (count $argv[3..]) -eq 0
+        echo (string replace -- $target "" $arguments | string trim)
+    else
+        _ni_remove_argv (string replace -- $target "" $arguments | string trim) $argv[3..]
+    end
+end
+
 function _ni_replace_argv --argument-names arguments target text
     set replaced (string replace -- $target $text $arguments)
     if test (count $argv[4..]) -eq 0
@@ -112,26 +132,34 @@ end
 function _ni_add_packages
     switch (_ni_get_package_manager_name $PWD)
         case "npm"
-            _ni_exec npm install (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
+            _ni_exec npm install (_ni_replace_argv "$argv" -g --global --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
         case "yarn"
-            _ni_exec yarn add (_ni_replace_argv "$argv" -D --dev -O --optional)
+            if _ni_contains_argv "$argv" --global -g
+                _ni_exec yarn global add (_ni_remove_argv "$argv" --global -g)
+            else
+                _ni_exec yarn add (_ni_replace_argv "$argv" -D --dev -O --optional)
+            end
         case "pnpm"
-            _ni_exec pnpm add (_ni_replace_argv "$argv" --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
+            _ni_exec pnpm add (_ni_replace_argv "$argv" -g --global --dev --save-dev -D --save-dev --optional --save-optional -O --save-optional)
         case "bun"
-            _ni_exec bun add (_ni_replace_argv "$argv" --dev --development -D --development -O --optional)
+            _ni_exec bun add (_ni_replace_argv "$argv" -g --global --dev --development -D --development -O --optional)
     end
 end
 
 function _ni_remove_packages
     switch (_ni_get_package_manager_name $PWD)
         case "npm"
-            _ni_exec npm uninstall $argv
+            _ni_exec npm uninstall (_ni_replace_argv "$argv" -g --global)
         case "yarn"
-            _ni_exec yarn remove $argv
+            if _ni_contains_argv "$argv" --global -g
+                _ni_exec yarn global remove (_ni_remove_argv "$argv" --global -g)
+            else
+                _ni_exec yarn remove $argv
+            end
         case "pnpm"
-            _ni_exec pnpm remove $argv
+            _ni_exec pnpm remove (_ni_replace_argv "$argv" -g --global)
         case "bun"
-            _ni_exec bun remove $argv
+            _ni_exec bun remove (_ni_replace_argv "$argv" -g --global)
     end
 end
 
