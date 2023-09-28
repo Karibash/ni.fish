@@ -9,6 +9,13 @@ Alternative [ni](https://github.com/antfu/ni) written in fish.
 - pnpm
 - bun
 
+## 📝 Requirements
+
+- [fish](https://github.com/fish-shell/fish-shell)
+  - This plugin is for fish shell.
+- [jq](https://github.com/jqlang/jq) (Optional)
+  - To complement script names, jq must be installed.
+
 ## 🚀 Installation
 
 Install with [Fisher](https://github.com/jorgebucaran/fisher):

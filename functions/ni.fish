@@ -35,8 +35,8 @@ function _ni_find_package_json --argument-names path
 end
 
 function _ni_get_package_manager_name --argument-names path
-    set lock_file_path (_ni_find_lock_file $PWD)
-    set package_json_path (test -n "$lock_file_path" && _ni_find_package_json $lock_file_path || _ni_find_package_json $PWD)
+    set lock_file_path (_ni_find_lock_file $path)
+    set package_json_path (test -n "$lock_file_path" && _ni_find_package_json $lock_file_path || _ni_find_package_json $path)
 
     if test -n "$package_json_path"
         set package_manager_name (awk -F\" '/"packageManager"/{print $4}' $package_json_path | sed -e 's/@.*//')
@@ -66,6 +66,19 @@ function _ni_get_package_manager_name --argument-names path
         case "bun.lockb"
             echo "bun"
     end
+end
+
+function _ni_get_package_script_names --argument-names path
+    if test -z (which jq)
+        return
+    end
+
+    set package_json_path (_ni_find_package_json $path)
+    if test -z "$package_json_path"
+        return
+    end
+
+    cat $package_json_path | jq -r '.scripts | keys | .[]'
 end
 
 function _ni_exec --argument-names command
